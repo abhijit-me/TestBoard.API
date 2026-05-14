@@ -142,6 +142,28 @@ public sealed class TaskFunctions(ITaskService taskService)
         }
     }
 
+    [Function(nameof(SearchTaskByDescription))]
+    [OpenApiOperation(operationId: "SearchTaskByDescription", tags: new[] { "Tasks" }, Summary = "Search tasks by description", Description = "Returns tasks whose description contains the given search string.", Visibility = OpenApiVisibilityType.Important)]
+    [OpenApiParameter(name: "description", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "Search string", Description = "The string to search for within task descriptions")]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<TaskItemDto>), Summary = "Matching tasks", Description = "The collection of tasks whose description contains the search string")]
+    [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid search string", Description = "The description search string is required")]
+    public async Task<HttpResponseData> SearchTaskByDescription(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "tasks/search/{description}")] HttpRequestData request,
+        string description)
+    {
+        try
+        {
+            var tasks = await taskService.SearchByDescriptionAsync(description);
+            var response = request.CreateResponse(HttpStatusCode.OK);
+            await response.WriteAsJsonAsync(tasks);
+            return response;
+        }
+        catch (ArgumentException exception)
+        {
+            return await CreateErrorResponseAsync(request, HttpStatusCode.BadRequest, exception.Message);
+        }
+    }
+
     [Function(nameof(DeleteTask))]
     [OpenApiOperation(operationId: "DeleteTask", tags: new[] { "Tasks" }, Summary = "Delete a task", Description = "Deletes an existing task.", Visibility = OpenApiVisibilityType.Important)]
     [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(int), Summary = "Task identifier", Description = "The id of the task to delete")]

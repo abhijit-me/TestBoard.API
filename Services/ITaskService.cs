@@ -14,5 +14,7 @@ public interface ITaskService
 
     Task<IReadOnlyList<TaskItemDto>> GetByAssigneeAsync(string assignedTo);
 
+    Task<IReadOnlyList<TaskItemDto>> SearchByDescriptionAsync(string description);
+
     Task<bool> DeleteAsync(int id);
 }

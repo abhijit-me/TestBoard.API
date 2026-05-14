@@ -1,0 +1,256 @@
+openapi: 3.0.1
+info:
+  title: TestBoard API
+  description: Task board API hosted as Azure Functions.
+  version: 1.0.0
+servers:
+  - url: https://testboard-fn.azurewebsites.net/api
+tags:
+  - name: Tasks
+    description: Task board item operations
+paths:
+  /tasks:
+    get:
+      tags:
+        - Tasks
+      operationId: GetAllTasks
+      summary: Get all tasks
+      description: Returns all tasks in the task board.
+      responses:
+        '200':
+          description: The collection of all task board items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskItemDto'
+    post:
+      tags:
+        - Tasks
+      operationId: CreateTask
+      summary: Create a new task
+      description: Creates a new task board item.
+      requestBody:
+        description: Task payload to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: The created task item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskItemDto'
+        '400':
+          description: The task payload is invalid
+  /tasks/assignee/{assignedTo}:
+    get:
+      tags:
+        - Tasks
+      operationId: GetTaskByAssignee
+      summary: Get tasks by assignee
+      description: Returns tasks assigned to a specific user.
+      parameters:
+        - name: assignedTo
+          in: path
+          required: true
+          description: The assignee used to filter tasks
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The collection of tasks assigned to the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskItemDto'
+        '400':
+          description: The assignee value is required
+  /tasks/search/{description}:
+    get:
+      tags:
+        - Tasks
+      operationId: SearchTaskByDescription
+      summary: Search tasks by description
+      description: Returns tasks whose description contains the given search string.
+      parameters:
+        - name: description
+          in: path
+          required: true
+          description: The string to search for within task descriptions
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The collection of tasks whose description contains the search string
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskItemDto'
+        '400':
+          description: The description search string is required
+  /tasks/{id}:
+    put:
+      tags:
+        - Tasks
+      operationId: UpdateTask
+      summary: Update an existing task
+      description: Updates all task details.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the task to update
+          schema:
+            type: integer
+      requestBody:
+        description: Updated task payload
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+      responses:
+        '200':
+          description: The updated task item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskItemDto'
+        '400':
+          description: The task payload is invalid
+        '404':
+          description: No task exists for the supplied id
+    delete:
+      tags:
+        - Tasks
+      operationId: DeleteTask
+      summary: Delete a task
+      description: Deletes an existing task.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the task to delete
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: The task was deleted successfully
+        '404':
+          description: No task exists for the supplied id
+  /tasks/{id}/status:
+    patch:
+      tags:
+        - Tasks
+      operationId: UpdateTaskStatus
+      summary: Update task status
+      description: Updates only the task status.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the task to update
+          schema:
+            type: integer
+      requestBody:
+        description: Updated task status payload
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskStatusRequest'
+      responses:
+        '200':
+          description: The task with its updated status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskItemDto'
+        '400':
+          description: The status payload is invalid
+        '404':
+          description: No task exists for the supplied id
+components:
+  schemas:
+    TaskItemDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        description:
+          type: string
+        priority:
+          type: string
+        status:
+          type: string
+        dueDate:
+          type: string
+          format: date-time
+        assignedTo:
+          type: string
+      required:
+        - description
+        - priority
+        - status
+        - assignedTo
+    CreateTaskRequest:
+      type: object
+      required:
+        - description
+        - priority
+        - status
+        - dueDate
+        - assignedTo
+      properties:
+        description:
+          type: string
+        priority:
+          type: string
+          enum: [Low, Medium, High, Critical]
+        status:
+          type: string
+          enum: ["To Do", "In Progress", Done, Blocked]
+        dueDate:
+          type: string
+          format: date-time
+        assignedTo:
+          type: string
+    UpdateTaskRequest:
+      type: object
+      required:
+        - description
+        - priority
+        - status
+        - dueDate
+        - assignedTo
+      properties:
+        description:
+          type: string
+        priority:
+          type: string
+          enum: [Low, Medium, High, Critical]
+        status:
+          type: string
+          enum: ["To Do", "In Progress", Done, Blocked]
+        dueDate:
+          type: string
+          format: date-time
+        assignedTo:
+          type: string
+    UpdateTaskStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: ["To Do", "In Progress", Done, Blocked]
