@@ -179,13 +179,21 @@ components:
         - assignedTo
     CreateTaskRequest:
       type: object
+      required:
+        - description
+        - priority
+        - status
+        - dueDate
+        - assignedTo
       properties:
         description:
           type: string
         priority:
           type: string
+          enum: [Low, Medium, High, Critical]
         status:
           type: string
+          enum: ["To Do", "In Progress", Done, Blocked]
         dueDate:
           type: string
           format: date-time
@@ -193,13 +201,21 @@ components:
           type: string
     UpdateTaskRequest:
       type: object
+      required:
+        - description
+        - priority
+        - status
+        - dueDate
+        - assignedTo
       properties:
         description:
           type: string
         priority:
           type: string
+          enum: [Low, Medium, High, Critical]
         status:
           type: string
+          enum: ["To Do", "In Progress", Done, Blocked]
         dueDate:
           type: string
           format: date-time
@@ -207,6 +223,9 @@ components:
           type: string
     UpdateTaskStatusRequest:
       type: object
+      required:
+        - status
       properties:
         status:
           type: string
+          enum: ["To Do", "In Progress", Done, Blocked]
