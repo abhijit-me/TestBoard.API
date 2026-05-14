@@ -72,6 +72,31 @@ paths:
                   $ref: '#/components/schemas/TaskItemDto'
         '400':
           description: The assignee value is required
+  /tasks/search/{description}:
+    get:
+      tags:
+        - Tasks
+      operationId: SearchTaskByDescription
+      summary: Search tasks by description
+      description: Returns tasks whose description contains the given search string.
+      parameters:
+        - name: description
+          in: path
+          required: true
+          description: The string to search for within task descriptions
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The collection of tasks whose description contains the search string
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskItemDto'
+        '400':
+          description: The description search string is required
   /tasks/{id}:
     put:
       tags:

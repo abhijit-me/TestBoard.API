@@ -81,6 +81,18 @@ public sealed class TaskService(TaskBoardDbContext dbContext) : ITaskService
             .ToListAsync();
     }
 
+    public async Task<IReadOnlyList<TaskItemDto>> SearchByDescriptionAsync(string description)
+    {
+        var searchTerm = ValidateRequired(description, nameof(description));
+
+        return await dbContext.Tasks
+            .AsNoTracking()
+            .Where(task => task.Description.ToLower().Contains(searchTerm.ToLower()))
+            .OrderBy(task => task.Id)
+            .Select(task => Map(task))
+            .ToListAsync();
+    }
+
     public async Task<bool> DeleteAsync(int id)
     {
         var entity = await dbContext.Tasks.FindAsync(id);
