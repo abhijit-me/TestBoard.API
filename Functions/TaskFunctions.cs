@@ -164,7 +164,8 @@ public sealed class TaskFunctions(ITaskService taskService)
         }
     }
 
-    [Function(nameof(DeleteTask))]    [OpenApiOperation(operationId: "DeleteTask", tags: new[] { "Tasks" }, Summary = "Delete a task", Description = "Deletes an existing task.", Visibility = OpenApiVisibilityType.Important)]
+    [Function(nameof(DeleteTask))]
+    [OpenApiOperation(operationId: "DeleteTask", tags: new[] { "Tasks" }, Summary = "Delete a task", Description = "Deletes an existing task.", Visibility = OpenApiVisibilityType.Important)]
     [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(int), Summary = "Task identifier", Description = "The id of the task to delete")]
     [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent, Summary = "Task deleted", Description = "The task was deleted successfully")]
     [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Task not found", Description = "No task exists for the supplied id")]
